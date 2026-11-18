@@ -1,0 +1,102 @@
+services:
+  mysql-order-platform:
+    image: mysql:8.0
+    container_name: mysql-order-platform
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: ${ORDER_DB_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${ORDER_DB_NAME}
+      MYSQL_USER: ${ORDER_DB_USER}
+      MYSQL_PASSWORD: ${ORDER_DB_PASSWORD}
+    ports:
+      - "127.0.0.1:${ORDER_DB_PORT}:3306"
+    volumes:
+      - order_db_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h localhost -uroot -p$$MYSQL_ROOT_PASSWORD --silent"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  mysql-erp-adapter:
+    image: mysql:8.0
+    container_name: mysql-erp-adapter
+    restart: unless-stopped
+    profiles: ["erp"]
+    environment:
+      MYSQL_ROOT_PASSWORD: ${ADAPTER_DB_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${ADAPTER_DB_NAME}
+      MYSQL_USER: ${ADAPTER_DB_USER}
+      MYSQL_PASSWORD: ${ADAPTER_DB_PASSWORD}
+    ports:
+      - "127.0.0.1:${ADAPTER_DB_PORT}:3306"
+    volumes:
+      - adapter_db_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h localhost -uroot -p$$MYSQL_ROOT_PASSWORD --silent"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  erp-adapter:
+    build:
+      context: ../backend/appts2
+      dockerfile: docker/Dockerfile
+    container_name: erp-adapter
+    restart: unless-stopped
+    profiles: ["erp"]
+    depends_on:
+      mysql-erp-adapter:
+        condition: service_healthy
+    environment:
+      SERVER_PORT: 8080
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql-erp-adapter:3306/${ADAPTER_DB_NAME}
+      SPRING_DATASOURCE_USERNAME: ${ADAPTER_DB_USER}
+      SPRING_DATASOURCE_PASSWORD: ${ADAPTER_DB_PASSWORD}
+      APP_ERP_ODBC_DRIVER_CLASS_NAME: ${APP_ERP_ODBC_DRIVER_CLASS_NAME}
+      APP_ERP_ODBC_URL: ${APP_ERP_ODBC_URL}
+      APP_ERP_ODBC_USERNAME: ${APP_ERP_ODBC_USERNAME}
+      APP_ERP_ODBC_PASSWORD: ${APP_ERP_ODBC_PASSWORD}
+    ports:
+      - "127.0.0.1:8080:8080"
+
+  order-platform:
+    build:
+      context: ../backend/appts
+      dockerfile: docker/Dockerfile
+    container_name: order-platform
+    restart: unless-stopped
+    depends_on:
+      mysql-order-platform:
+        condition: service_healthy
+    environment:
+      SERVER_PORT: 9090
+      SERVER_SSL_ENABLED: "false"
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql-order-platform:3306/${ORDER_DB_NAME}
+      SPRING_DATASOURCE_USERNAME: ${ORDER_DB_USER}
+      SPRING_DATASOURCE_PASSWORD: ${ORDER_DB_PASSWORD}
+      APP_FEIGN_ERP_ADAPTER_URL: ${APP_FEIGN_ERP_ADAPTER_URL}
+      APP_FRONTEND_ORIGIN: ${APP_FRONTEND_ORIGIN}
+      APP_CORS_ALLOWED_ORIGINS: ${APP_CORS_ALLOWED_ORIGINS}
+      APP_JWT_SECRET: ${APP_JWT_SECRET}
+      APP_JWT_EXPIRATION_MS: ${APP_JWT_EXPIRATION_MS}
+    ports:
+      - "127.0.0.1:9090:9090"
+
+  frontend:
+    build:
+      context: ../frontend
+      dockerfile: docker/Dockerfile
+      args:
+        REACT_APP_API_BASE_URL: ${REACT_APP_API_BASE_URL}
+        REACT_APP_WS_BASE_URL: ${REACT_APP_WS_BASE_URL}
+    container_name: order-frontend
+    restart: unless-stopped
+    depends_on:
+      - order-platform
+    ports:
+      - "127.0.0.1:3000:80"
+
+volumes:
+  order_db_data:
+  adapter_db_data:

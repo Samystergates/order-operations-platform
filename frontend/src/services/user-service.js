@@ -1,0 +1,16 @@
+import { myAxios } from "./helper";
+import { privateAxios } from "./helper";
+
+export const signUp = (user) => {
+  return myAxios.post("/v1/auth/register", user).then((response) => response.data);
+};
+
+export const loginUser = (loginDetail) => {
+  return myAxios
+    .post("/v1/auth/login", loginDetail)
+    .then((response) => response.data);
+};
+
+export const getUser = (userId) => {
+  return privateAxios.get(`/user/admin/usermanagement/get/${userId}`).then((resp) => resp.data);
+};

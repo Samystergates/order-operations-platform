@@ -1,0 +1,88 @@
+# Environment files and secrets
+.env
+.env.*
+**/.env
+**/.env.*
+!.env.example
+!**/.env.example
+
+# Do not add nested repositories to this project
+**/.git/
+
+*.pem*
+*.pfx*
+*.p12*
+*.crt*
+*.cer*
+*.key*
+*.jks
+*.jceks
+*.class
+jmxremote.access
+jmxremote.password
+
+# Node / frontend
+node_modules/
+**/node_modules/
+**/.npm/
+**/.cache/
+frontend/build/
+frontend/dist/
+/coverage/
+**/coverage/
+/frontend/.eslintcache
+/frontend/certs/
+/frontend/certs.old/
+/frontend/sfiles/
+/frontend/user/
+/frontend/https run app.bat
+/frontend/script.bat
+
+# Proprietary ERP driver packages are supplied by the deployment environment
+/backend/appts2/vendor/
+
+# Build outputs
+build/
+**/build/
+target/
+**/target/
+dist/
+**/dist/
+
+# Local caches and generated files
+.m2/
+**/.m2/
+logs/
+**/logs/
+*.log
+*.log.*
+hs_err_pid*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+*.tmp
+*.swp
+*.swo
+*~
+
+# IDE / editor clutter
+.vscode/
+.idea/
+*.iml
+*.ipr
+*.iws
+.classpath
+.factorypath
+.project
+.settings/
+.springBeans
+.sts4-cache
+
+# OS files
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# Keep the Maven Wrapper JAR required to bootstrap Maven
+!.mvn/wrapper/maven-wrapper.jar

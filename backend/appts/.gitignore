@@ -1,0 +1,60 @@
+# Build outputs
+/target/
+**/target/
+/build/
+**/build/
+/dist/
+**/dist/
+
+# Local dependency caches
+/.m2/
+**/.m2/
+
+# Node / frontend runtime
+node_modules/
+**/node_modules/
+frontend/build/
+frontend/dist/
+
+# Environment and secrets
+.env
+.env.*
+!.env.example
+!**/.env.example
+*.pem*
+*.pfx*
+*.p12*
+*.crt*
+*.cer*
+*.key*
+*.jks
+*.jceks
+jmxremote.access
+jmxremote.password
+
+# Local runtime / generated files
+*.log
+*.log.*
+app-console.log*
+app1-console.log*
+hs_err_pid*.log
+
+# IDE/editor clutter
+.idea/
+.vscode/
+*.iml
+*.ipr
+*.iws
+.classpath
+.factorypath
+.project
+.settings/
+.springBeans
+.sts4-cache
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Keep Maven wrapper executable
+!.mvn/wrapper/maven-wrapper.jar
